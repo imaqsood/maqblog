@@ -1,8 +1,8 @@
 class BlogsController < ApplicationController
-  before_action :set_blog, only: [:show, :edit, :update, :destroy]
+  before_action :set_blog, only: [:show, :edit, :update, :destroy, :toggle_status]
 
   def index
-    @blogs = Blog.all
+    @blogs = Blog.order(:created_at)
   end
 
   def show
@@ -43,9 +43,14 @@ class BlogsController < ApplicationController
     end
   end
 
+  def toggle_status
+    @blog.draft? ? @blog.published! : (@blog.draft! if @blog.published?)
+    redirect_to blogs_url, notice: 'Blog was successfully updated.'
+  end
+
   private
     def set_blog
-      @blog = Blog.find(params[:id])
+      @blog = Blog.friendly.find(params[:id])
     end
 
     def blog_params
